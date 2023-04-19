@@ -9,10 +9,10 @@ import (
 )
 
 type PokemonHandler struct {
-	pokemonService pokemon.PokemonService
+	pokemonService *pokemon.PokemonService
 }
 
-func NewPokemonHandler(pokemonService pokemon.PokemonService) *PokemonHandler {
+func NewPokemonHandler(pokemonService *pokemon.PokemonService) *PokemonHandler {
 	return &PokemonHandler{pokemonService: pokemonService}
 }
 

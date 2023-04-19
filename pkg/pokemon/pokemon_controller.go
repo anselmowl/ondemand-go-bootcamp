@@ -24,7 +24,7 @@ func (ctrl *PokemonController) GetPokemonByID(c *gin.Context) {
 
 	pokemon, err := ctrl.dao.GetPokemonByID(id)
 	if err != nil {
-		c.JSON(404, gin.H{"error": errors.Wrap(err, "unableto get the pokemon").Error()})
+		c.JSON(404, gin.H{"error": errors.Wrap(err, "unable to get the pokemon").Error()})
 	}
 
 	c.JSON(200, gin.H{"pokemon": pokemon})
