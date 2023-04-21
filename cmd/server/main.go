@@ -1,9 +1,11 @@
 package main
 
 import (
-	"go-bootcamp/api"
-	"go-bootcamp/app"
-	"go-bootcamp/pkg/pokemon"
+	"fmt"
+	"go-bootcamp/api/router"
+	"go-bootcamp/data"
+	"go-bootcamp/service"
+	"log"
 	"os"
 	"path/filepath"
 )
@@ -12,15 +14,15 @@ func main() {
 	workingDirectory, _ := os.Getwd()
 	rootDirectory := filepath.Dir(filepath.Dir(workingDirectory))
 
-	pokemonDAO := pokemon.NewPokemonDAO(rootDirectory + "/Pokemon.csv")
+	pokemonDAO := data.NewPokemonDAO(rootDirectory + "/Pokemon.csv")
 
-	pokemonService := pokemon.NewPokemonService(pokemonDAO)
+	pokemonService := service.NewPokemonService(pokemonDAO)
 
-	pokemonHandler := api.NewPokemonHandler(pokemonService)
+	router := router.InitRouter(pokemonService)
 
-	router := app.NewRouter(pokemonHandler)
+	err := router.Run(":8080")
 
-	r := router.SetupRoutes()
-
-	r.Run()
+	if err != nil {
+		log.Fatalf(fmt.Sprintf("Error starting server: %s", err.Error()))
+	}
 }

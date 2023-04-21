@@ -1,22 +1,27 @@
-package pokemon
+package data
 
 import (
 	"encoding/csv"
+	"go-bootcamp/model"
 	"os"
 	"strconv"
 
 	"github.com/pkg/errors"
 )
 
-type PokemonDAO struct {
+type PokemonDAO interface {
+	GetPokemonByID(id int) (*model.Pokemon, error)
+}
+
+type pokemonDAO struct {
 	filename string
 }
 
-func NewPokemonDAO(filename string) *PokemonDAO {
-	return &PokemonDAO{filename: filename}
+func NewPokemonDAO(filename string) PokemonDAO {
+	return &pokemonDAO{filename: filename}
 }
 
-func (dao *PokemonDAO) GetPokemonByID(id int) (*Pokemon, error) {
+func (dao *pokemonDAO) GetPokemonByID(id int) (*model.Pokemon, error) {
 	// Open CSV file
 	f, err := os.Open(dao.filename)
 	if err != nil {
@@ -34,7 +39,7 @@ func (dao *PokemonDAO) GetPokemonByID(id int) (*Pokemon, error) {
 	// search the pokemon by id
 	for _, pkm := range pokemons {
 		if (pkm[0]) == strconv.Itoa(id) {
-			pokemon := &Pokemon{
+			pokemon := &model.Pokemon{
 				ID:   id,
 				Name: pkm[1],
 			}
