@@ -13,6 +13,7 @@ func InitRouter(pokemonService service.PokemonService) *gin.Engine {
 	pokemonGroup := router.Group("/pokemon")
 	pokemonController := controller.NewPokemonController(pokemonService)
 	pokemonGroup.GET("/:id", pokemonController.GetPokemonByID)
+	pokemonGroup.GET("color/:id", pokemonController.GetPokemonColor)
 
 	return router
 }

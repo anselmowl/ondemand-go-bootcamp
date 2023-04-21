@@ -10,6 +10,7 @@ import (
 
 type PokemonController interface {
 	GetPokemonByID(c *gin.Context)
+	GetPokemonColor(c *gin.Context)
 }
 
 type pokemonController struct {
@@ -28,6 +29,21 @@ func (ctrl *pokemonController) GetPokemonByID(c *gin.Context) {
 	}
 
 	pokemon, err := ctrl.pokemonService.GetPokemonByID(id)
+	if err != nil {
+		c.JSON(404, gin.H{"error": errors.Wrap(err, "unable to get the pokemon").Error()})
+	}
+
+	c.JSON(200, gin.H{"pokemon": pokemon})
+}
+
+func (ctrl *pokemonController) GetPokemonColor(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(400, gin.H{"error": errors.Wrap(err, "invalid ID").Error()})
+	}
+
+	pokemon, err := ctrl.pokemonService.GetPokemonColor(id)
 	if err != nil {
 		c.JSON(404, gin.H{"error": errors.Wrap(err, "unable to get the pokemon").Error()})
 	}
