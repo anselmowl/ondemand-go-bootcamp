@@ -58,12 +58,12 @@ func (dao *pokemonDAO) GetPokemonColor(id int) (model.PokemonColor, error) {
 	url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon-species/%s", strconv.Itoa(id))
 	resp, err := http.Get(url)
 	if err != nil {
-		return model.PokemonColor{}, errors.Wrap(err, "unable to get pokemon evolution")
+		return model.PokemonColor{}, errors.Wrap(err, "unable to get pokemon color")
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return model.PokemonColor{}, errors.New("failed to get pokemon evolution: status code " + strconv.Itoa(resp.StatusCode))
+		return model.PokemonColor{}, errors.New("failed to get pokemon color: status code " + strconv.Itoa(resp.StatusCode))
 	}
 
 	body, err := io.ReadAll(resp.Body)
