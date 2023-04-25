@@ -11,6 +11,8 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type PokemonDAO interface {
@@ -74,17 +76,33 @@ func (dao *pokemonDAO) GetPokemonColor(id int) (model.PokemonColor, error) {
 	var data map[string]any
 	json.Unmarshal([]byte(body), &data)
 
+	caser := cases.Title(language.Und)
+
 	color := data["color"].(map[string]any)
 
 	pokemon := model.Pokemon{
 		ID:   id,
-		Name: data["name"].(string),
+		Name: caser.String(data["name"].(string)),
 	}
 
 	pokemonColor := model.PokemonColor{
 		Pokemon: pokemon,
-		Color:   color["name"].(string),
+		Color:   caser.String(color["name"].(string)),
 	}
+
+	csvFile, _ := os.OpenFile(dao.filename, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+	defer csvFile.Close()
+
+	writer := csv.NewWriter(csvFile)
+	defer writer.Flush()
+
+	record := []string{
+		strconv.Itoa(pokemon.ID),
+		pokemon.Name,
+		pokemonColor.Color,
+	}
+
+	writer.Write(record)
 
 	return pokemonColor, nil
 }

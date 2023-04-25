@@ -32,11 +32,11 @@ func TestPokemonController_GetPokemonColor(t *testing.T) {
 
 	pokemon := model.Pokemon{
 		ID:   1,
-		Name: "bulbasaur",
+		Name: "Bulbasaur",
 	}
 	pokemonColor := model.PokemonColor{
 		Pokemon: pokemon,
-		Color:   "green",
+		Color:   "Green",
 	}
 
 	pokeMock, _ := json.Marshal(pokemonColor)
@@ -66,7 +66,7 @@ func TestPokemonController_GetPokemonByID(t *testing.T) {
 
 	pokemon := model.Pokemon{
 		ID:   1,
-		Name: "bulbasaur",
+		Name: "Bulbasaur",
 	}
 
 	pokeMock, _ := json.Marshal(pokemon)
