@@ -27,6 +27,40 @@ func (m *MockPokemonDAO) GetPokemonColor(id int) (model.PokemonColor, error) {
 	return args.Get(0).(model.PokemonColor), args.Error(1)
 }
 
+func TestPokemonController_GetPokemonColor(t *testing.T) {
+	mockDAO := &MockPokemonDAO{}
+
+	pokemon := model.Pokemon{
+		ID:   1,
+		Name: "bulbasaur",
+	}
+	pokemonColor := model.PokemonColor{
+		Pokemon: pokemon,
+		Color:   "green",
+	}
+
+	pokeMock, _ := json.Marshal(pokemonColor)
+
+	mockDAO.On("GetPokemonColor", 1).Return(pokemonColor, nil)
+
+	srv := service.NewPokemonService(mockDAO)
+	ctrl := NewPokemonController(srv)
+
+	router := gin.Default()
+	router.GET("/pokemon/color/:id", ctrl.GetPokemonColor)
+
+	req, err := http.NewRequest("GET", "/pokemon/color/1", nil)
+
+	rec := httptest.NewRecorder()
+
+	router.ServeHTTP(rec, req)
+
+	assert.NoError(t, err)
+	mockDAO.AssertCalled(t, "GetPokemonColor", 1)
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.Contains(t, rec.Body.String(), string(pokeMock))
+}
+
 func TestPokemonController_GetPokemonByID(t *testing.T) {
 	mockDAO := &MockPokemonDAO{}
 
