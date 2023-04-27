@@ -8,6 +8,7 @@ import (
 type PokemonService interface {
 	GetPokemonByID(id int) (model.Pokemon, error)
 	GetPokemonColor(id int) (model.PokemonColor, error)
+	GetPokemonsByIDRange(minId, maxId, workers int) ([]model.Pokemon, error)
 }
 
 type pokemonService struct {
@@ -24,4 +25,8 @@ func (s *pokemonService) GetPokemonByID(id int) (model.Pokemon, error) {
 
 func (s *pokemonService) GetPokemonColor(id int) (model.PokemonColor, error) {
 	return s.dao.GetPokemonColor(id)
+}
+
+func (s *pokemonService) GetPokemonsByIDRange(minId, maxId, workers int) ([]model.Pokemon, error) {
+	return s.dao.GetPokemonsByIDRange(minId, maxId, workers)
 }
