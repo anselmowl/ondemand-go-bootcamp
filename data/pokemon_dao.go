@@ -110,34 +110,81 @@ func (dao *pokemonDAO) GetPokemonColor(id int) (model.PokemonColor, error) {
 }
 
 func (dao *pokemonDAO) GetPokemonsByIDRange(minId, maxId, workers int) ([]model.Pokemon, error) {
-	var pokemons []model.Pokemon
+	// var pokemons []model.Pokemon
 
-	idChannel := make(chan int)
+	// idChannel := make(chan int)
+	// var wg sync.WaitGroup
 
-	var wg sync.WaitGroup
+	// for i := 0; i < workers; i++ {
+	// 	wg.Add(1)
+	// 	go dao.GetPokemonsByIDRangeWorker(idChannel, &pokemons, &wg)
+	// }
+
+	// for i := minId; i <= maxId; i++ {
+	// 	idChannel <- i
+	// }
+
+	// close(idChannel)
+
+	// wg.Wait()
+
+	// return pokemons, nil
+
+	idCahannel := make(chan int, maxId-minId+1)
+	defer close(idCahannel)
+
+	for i := minId; i <= maxId; i++ {
+		idCahannel <- i
+	}
+
+	wg := sync.WaitGroup{}
+
+	pool := make(chan struct{}, workers)
+
+	resultChannel := make(chan model.Pokemon, maxId-minId+1)
 
 	for i := 0; i < workers; i++ {
 		wg.Add(1)
-		go dao.GetPokemonsByIDRangeWorker(idChannel, &pokemons, &wg)
+		go dao.GetPokemonsByIDRangeWorker(idCahannel, pool, resultChannel, &wg)
 	}
-
-	for i := minId; i <= maxId; i++ {
-		idChannel <- i
-	}
-
-	close(idChannel)
 
 	wg.Wait()
 
+	close(resultChannel)
+
+	pokemons := make([]model.Pokemon, 0, maxId-minId+1)
+	for pokemon := range resultChannel {
+		pokemons = append(pokemons, pokemon)
+	}
 	return pokemons, nil
 }
 
-func (dao *pokemonDAO) GetPokemonsByIDRangeWorker(idChannel <-chan int, pokemons *[]model.Pokemon, wg *sync.WaitGroup) {
+func (dao *pokemonDAO) GetPokemonsByIDRangeWorker(idChannel chan int, pool chan struct{}, resultChannel chan model.Pokemon, wg *sync.WaitGroup) {
+	// defer wg.Done()
+	// for id := range idChannel {
+	// 	pokemon, err := dao.GetPokemonByID(id)
+	// 	if err == nil {
+	// 		*pokemons = append(*pokemons, pokemon)
+	// 	}
+	// }
 	defer wg.Done()
-	for id := range idChannel {
-		pokemon, err := dao.GetPokemonByID(id)
-		if err == nil {
-			*pokemons = append(*pokemons, pokemon)
-		}
+
+	pool <- struct{}{}
+	defer func() {
+		<-pool
+	}()
+
+	id, ok := <-idChannel
+	if !ok {
+		return
 	}
+
+	pokemon, err := dao.GetPokemonByID(id)
+	if err != nil {
+		errors.Wrap(err, "unable to get pokemon with ID: "+strconv.Itoa(id))
+		return
+	}
+
+	resultChannel <- pokemon
+
 }

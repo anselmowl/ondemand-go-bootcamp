@@ -27,6 +27,11 @@ func (m *MockPokemonDAO) GetPokemonColor(id int) (model.PokemonColor, error) {
 	return args.Get(0).(model.PokemonColor), args.Error(1)
 }
 
+func (m *MockPokemonDAO) GetPokemonsByIDRange(minId, maxId, workers int) ([]model.Pokemon, error) {
+	args := m.Called(minId, maxId, workers)
+	return args.Get(0).([]model.Pokemon), args.Error(1)
+}
+
 func TestPokemonController_GetPokemonColor(t *testing.T) {
 	mockDAO := &MockPokemonDAO{}
 
