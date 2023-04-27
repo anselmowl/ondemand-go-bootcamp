@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"sync"
 
 	"github.com/pkg/errors"
 	"golang.org/x/text/cases"
@@ -18,6 +19,7 @@ import (
 type PokemonDAO interface {
 	GetPokemonByID(id int) (model.Pokemon, error)
 	GetPokemonColor(id int) (model.PokemonColor, error)
+	GetPokemonsByIDRange(minId, maxId, workers int) ([]model.Pokemon, error)
 }
 
 type pokemonDAO struct {
@@ -105,4 +107,37 @@ func (dao *pokemonDAO) GetPokemonColor(id int) (model.PokemonColor, error) {
 	writer.Write(record)
 
 	return pokemonColor, nil
+}
+
+func (dao *pokemonDAO) GetPokemonsByIDRange(minId, maxId, workers int) ([]model.Pokemon, error) {
+	var pokemons []model.Pokemon
+
+	idChannel := make(chan int)
+
+	var wg sync.WaitGroup
+
+	for i := 0; i < workers; i++ {
+		wg.Add(1)
+		go dao.GetPokemonsByIDRangeWorker(idChannel, &pokemons, &wg)
+	}
+
+	for i := minId; i <= maxId; i++ {
+		idChannel <- i
+	}
+
+	close(idChannel)
+
+	wg.Wait()
+
+	return pokemons, nil
+}
+
+func (dao *pokemonDAO) GetPokemonsByIDRangeWorker(idChannel <-chan int, pokemons *[]model.Pokemon, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for id := range idChannel {
+		pokemon, err := dao.GetPokemonByID(id)
+		if err == nil {
+			*pokemons = append(*pokemons, pokemon)
+		}
+	}
 }
