@@ -5,6 +5,7 @@ appropriate model as response.
 package controller // import "go-bootcamp/controller"
 
 import (
+	"net/http"
 	"strconv"
 
 	"go-bootcamp/service"
@@ -34,13 +35,13 @@ func (ctrl *pokemonController) GetPokemonByID(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		c.JSON(400, gin.H{"error": errors.Wrap(err, "invalid ID").Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": errors.Wrap(err, "invalid ID").Error()})
 	}
 
 	pokemon, err := ctrl.pokemonService.GetPokemonByID(id)
 	if err != nil {
-		c.JSON(404, gin.H{"error": errors.Wrap(err, "unable to get the pokemon").Error()})
+		c.JSON(http.StatusNotFound, gin.H{"error": errors.Wrap(err, "unable to get the pokemon").Error()})
 	}
 
-	c.JSON(200, gin.H{"pokemon": pokemon})
+	c.JSON(http.StatusOK, gin.H{"pokemon": pokemon})
 }
