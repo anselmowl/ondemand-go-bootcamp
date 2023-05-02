@@ -2,9 +2,10 @@ package data
 
 import (
 	"encoding/csv"
-	"go-bootcamp/model"
 	"os"
 	"strconv"
+
+	"go-bootcamp/model"
 
 	"github.com/pkg/errors"
 )

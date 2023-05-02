@@ -1,8 +1,9 @@
 package controller
 
 import (
-	"go-bootcamp/service"
 	"strconv"
+
+	"go-bootcamp/service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"

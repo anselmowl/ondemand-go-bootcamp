@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"go-bootcamp/api/router"
-	"go-bootcamp/data"
-	"go-bootcamp/service"
 	"log"
 	"os"
 	"path/filepath"
+
+	"go-bootcamp/api/router"
+	"go-bootcamp/data"
+	"go-bootcamp/service"
 )
 
 func main() {
