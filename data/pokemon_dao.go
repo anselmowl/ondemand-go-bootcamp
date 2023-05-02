@@ -1,4 +1,7 @@
-package data
+/*
+Package data implements the logic to retrive structured objects from data sources.
+*/
+package data // import "go-bootcamp/data"
 
 import (
 	"encoding/csv"
@@ -10,18 +13,22 @@ import (
 	"github.com/pkg/errors"
 )
 
+// PokemonDAO is the interface which wraps all the functions with the logic to retrive Data Access Objects related to pokemon resources
 type PokemonDAO interface {
 	GetPokemonByID(id int) (*model.Pokemon, error)
 }
 
+// pokemonDAO is a struct that defines a Data Access Object for pokemons
 type pokemonDAO struct {
-	filename string
+	filename string // The CSV file path where pokemon data is stored
 }
 
+// NewPokemonDAO cretes a new instance of pokemonDAO
 func NewPokemonDAO(filename string) PokemonDAO {
 	return &pokemonDAO{filename: filename}
 }
 
+// GetPokemonByID returns a Pokemon object with the fiven ID from the CSV file
 func (dao *pokemonDAO) GetPokemonByID(id int) (*model.Pokemon, error) {
 	// Open CSV file
 	f, err := os.Open(dao.filename)

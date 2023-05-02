@@ -1,4 +1,7 @@
-package router
+/*
+Package router implements the HTTP router.
+*/
+package router // import "go-bootcamp/router"
 
 import (
 	"go-bootcamp/api/controller"
@@ -7,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Sets up the HTTP router for the controllers functions
 func InitRouter(pokemonService service.PokemonService) *gin.Engine {
 	router := gin.Default()
 
