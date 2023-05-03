@@ -47,6 +47,8 @@ func (ctrl *pokemonController) GetPokemonByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"pokemon": pokemon})
 }
 
+// GetPokemonColor gets a Pokemon object and its color that match its pokedex number with the given ID
+// the given Id should be a positive integer in the range of 1 to 151.
 func (ctrl *pokemonController) GetPokemonColor(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)

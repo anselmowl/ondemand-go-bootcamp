@@ -9,6 +9,7 @@ type Pokemon struct {
 	Name string `json:"name"`
 }
 
+// PokemonColor is the model which represents a Pokemon object and its color
 type PokemonColor struct {
 	Pokemon Pokemon `json:"data"`
 	Color   string  `json:"color"`

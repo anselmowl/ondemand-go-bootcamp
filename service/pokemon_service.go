@@ -25,10 +25,12 @@ func NewPokemonService(dao data.PokemonDAO) PokemonService {
 	return &pokemonService{dao: dao}
 }
 
+// GetPokemonById returns a pokemon object with the given ID from the data layer by searching the data from a CSV file.
 func (s *pokemonService) GetPokemonByID(id int) (model.Pokemon, error) {
 	return s.dao.GetPokemonByID(id)
 }
 
+// GetPokemonById returns a pokemon object and its color with the given ID from the data layer by consuming an external API.
 func (s *pokemonService) GetPokemonColor(id int) (model.PokemonColor, error) {
 	return s.dao.GetPokemonColor(id)
 }

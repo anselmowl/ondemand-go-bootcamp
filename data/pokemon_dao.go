@@ -36,6 +36,7 @@ func NewPokemonDAO() PokemonDAO {
 	return &pokemonDAO{filename: getFilePath()}
 }
 
+// GetPokemonByID returns a Pokemon object with the fiven ID from the CSV file
 func (dao *pokemonDAO) GetPokemonByID(id int) (model.Pokemon, error) {
 	// Open CSV file
 	f, err := os.Open(dao.filename)
@@ -64,6 +65,7 @@ func (dao *pokemonDAO) GetPokemonByID(id int) (model.Pokemon, error) {
 	return model.Pokemon{}, errors.New("pokemon not found")
 }
 
+// GetPokemonColor returns a Pokemon object and its color with the given ID from an external API
 func (dao *pokemonDAO) GetPokemonColor(id int) (model.PokemonColor, error) {
 	url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon-species/%s", strconv.Itoa(id))
 	resp, err := http.Get(url)

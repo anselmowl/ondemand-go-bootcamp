@@ -2,31 +2,36 @@ package controller
 
 import (
 	"encoding/json"
-	"go-bootcamp/model"
-	"go-bootcamp/service"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"go-bootcamp/model"
+	"go-bootcamp/service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
+// MockPokemonDAO struct which creates a Mock of a Pokemon Data Access Object
 type MockPokemonDAO struct {
 	mock.Mock
 }
 
+// GetPokemonByID represents the data object that will be mocked for the data.PokemonDAO.GetPokemonByID function test
 func (m *MockPokemonDAO) GetPokemonByID(id int) (model.Pokemon, error) {
 	args := m.Called(id)
 	return args.Get(0).(model.Pokemon), args.Error(1)
 }
 
+// GetPokemonColor represents the data object that will be mocked for the data.PokemonDAO.GetPokemonColor function test
 func (m *MockPokemonDAO) GetPokemonColor(id int) (model.PokemonColor, error) {
 	args := m.Called(id)
 	return args.Get(0).(model.PokemonColor), args.Error(1)
 }
 
+// TestPokemonController_GetPokemonColor tests a succesful request to the Controller GetPokemonColor function
 func TestPokemonController_GetPokemonColor(t *testing.T) {
 	mockDAO := &MockPokemonDAO{}
 
@@ -61,6 +66,7 @@ func TestPokemonController_GetPokemonColor(t *testing.T) {
 	assert.Contains(t, rec.Body.String(), string(pokeMock))
 }
 
+// TestPokemonController_GetPokemonByID tests a succesful request to the Controller GetPokemonById function
 func TestPokemonController_GetPokemonByID(t *testing.T) {
 	mockDAO := &MockPokemonDAO{}
 
