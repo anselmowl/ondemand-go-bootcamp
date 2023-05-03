@@ -1,28 +1,40 @@
 package main
 
 import (
-	"fmt"
+	"context"
+
+	"go-bootcamp/api/controller"
 	"go-bootcamp/api/router"
 	"go-bootcamp/data"
 	"go-bootcamp/service"
-	"log"
-	"os"
-	"path/filepath"
+
+	"github.com/gin-gonic/gin"
+	"go.uber.org/fx"
 )
 
 func main() {
-	workingDirectory, _ := os.Getwd()
-	rootDirectory := filepath.Dir(filepath.Dir(workingDirectory))
+	// Provide all the dependencies
+	app := fx.New(
+		fx.Provide(
+			data.NewPokemonDAO,
+			service.NewPokemonService,
+			controller.NewPokemonController,
+			router.InitRouter,
+		),
+		fx.Invoke(NewHTTPServer),
+	)
 
-	pokemonDAO := data.NewPokemonDAO(rootDirectory + "/Pokemon.csv")
+	app.Run()
+}
 
-	pokemonService := service.NewPokemonService(pokemonDAO)
-
-	router := router.InitRouter(pokemonService)
-
-	err := router.Run(":8080")
-
-	if err != nil {
-		log.Fatalf(fmt.Sprintf("Error starting server: %s", err.Error()))
-	}
+func NewHTTPServer(lc fx.Lifecycle, ge *gin.Engine) {
+	lc.Append(
+		fx.Hook{
+			OnStart: func(ctx context.Context) error {
+				// Run the server on the specified port
+				go ge.Run(":8080")
+				return nil
+			},
+		},
+	)
 }

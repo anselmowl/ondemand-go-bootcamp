@@ -1,31 +1,39 @@
-package data
+/*
+Package data implements the logic to retrive structured objects from data sources.
+*/
+package data // import "go-bootcamp/data"
 
 import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	"go-bootcamp/model"
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
+
+	"go-bootcamp/model"
 
 	"github.com/pkg/errors"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
 
+// PokemonDAO is the interface which wraps all the functions with the logic to retrive Data Access Objects related to pokemon resources
 type PokemonDAO interface {
 	GetPokemonByID(id int) (model.Pokemon, error)
 	GetPokemonColor(id int) (model.PokemonColor, error)
 }
 
+// pokemonDAO is a struct that defines a Data Access Object for pokemons
 type pokemonDAO struct {
-	filename string
+	filename string // The CSV file path where pokemon data is stored
 }
 
-func NewPokemonDAO(filename string) PokemonDAO {
-	return &pokemonDAO{filename: filename}
+// NewPokemonDAO cretes a new instance of pokemonDAO
+func NewPokemonDAO() PokemonDAO {
+	return &pokemonDAO{filename: getFilePath()}
 }
 
 func (dao *pokemonDAO) GetPokemonByID(id int) (model.Pokemon, error) {
@@ -105,4 +113,11 @@ func (dao *pokemonDAO) GetPokemonColor(id int) (model.PokemonColor, error) {
 	writer.Write(record)
 
 	return pokemonColor, nil
+}
+
+// Get the the file path (The SCV file is at root directory).
+func getFilePath() (rootPath string) {
+	workingDirectory, _ := os.Getwd()
+	rootDirectory := filepath.Dir(filepath.Dir(workingDirectory))
+	return rootDirectory + "/Pokemon.csv"
 }
