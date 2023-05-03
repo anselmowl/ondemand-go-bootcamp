@@ -1,33 +1,40 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"os"
-	"path/filepath"
+	"context"
 
+	"go-bootcamp/api/controller"
 	"go-bootcamp/api/router"
 	"go-bootcamp/data"
 	"go-bootcamp/service"
+
+	"github.com/gin-gonic/gin"
+	"go.uber.org/fx"
 )
 
 func main() {
-	// Get the the root directory (The SCV file is in that directory).
-	workingDirectory, _ := os.Getwd()
-	rootDirectory := filepath.Dir(filepath.Dir(workingDirectory))
+	// Provide all the dependencies
+	app := fx.New(
+		fx.Provide(
+			data.NewPokemonDAO,
+			service.NewPokemonService,
+			controller.NewPokemonController,
+			router.InitRouter,
+		),
+		fx.Invoke(NewHTTPServer),
+	)
 
-	//Initialiize the pokemon service with the data layer instance.
-	pokemonDAO := data.NewPokemonDAO(rootDirectory + "/Pokemon.csv")
-	pokemonService := service.NewPokemonService(pokemonDAO)
+	app.Run()
+}
 
-	// Initilize the router using Gin-Gonic framework
-	// the pokemonService instance is used as parameter to create an
-	// instance of the pokemonController and add it to the router.
-	router := router.InitRouter(pokemonService)
-
-	// Run the server on the specified port
-	err := router.Run(":8080")
-	if err != nil {
-		log.Fatalf(fmt.Sprintf("Error starting server: %s", err.Error()))
-	}
+func NewHTTPServer(lc fx.Lifecycle, ge *gin.Engine) {
+	lc.Append(
+		fx.Hook{
+			OnStart: func(ctx context.Context) error {
+				// Run the server on the specified port
+				go ge.Run(":8080")
+				return nil
+			},
+		},
+	)
 }

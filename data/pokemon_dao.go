@@ -6,6 +6,7 @@ package data // import "go-bootcamp/data"
 import (
 	"encoding/csv"
 	"os"
+	"path/filepath"
 	"strconv"
 
 	"go-bootcamp/model"
@@ -24,8 +25,8 @@ type pokemonDAO struct {
 }
 
 // NewPokemonDAO cretes a new instance of pokemonDAO
-func NewPokemonDAO(filename string) PokemonDAO {
-	return &pokemonDAO{filename: filename}
+func NewPokemonDAO() PokemonDAO {
+	return &pokemonDAO{filename: getFilePath()}
 }
 
 // GetPokemonByID returns a Pokemon object with the fiven ID from the CSV file
@@ -55,4 +56,11 @@ func (dao *pokemonDAO) GetPokemonByID(id int) (*model.Pokemon, error) {
 		}
 	}
 	return nil, errors.New("pokemon not found")
+}
+
+// Get the the file path (The SCV file is at root directory).
+func getFilePath() (rootPath string) {
+	workingDirectory, _ := os.Getwd()
+	rootDirectory := filepath.Dir(filepath.Dir(workingDirectory))
+	return rootDirectory + "/Pokemon.csv"
 }
